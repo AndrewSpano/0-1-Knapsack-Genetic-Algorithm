@@ -1,4 +1,6 @@
 include("algorithms/brute_force.jl")
+include("algorithms/greedy.jl")
+include("algorithms/dynamic_programming.jl")
 
 import Printf
 import Random
@@ -15,8 +17,19 @@ function main()
     values = rand(1:15, 10)
     W = 50
 
-    solution = brute_force_knapsack(weights, values, W)
-    println(solution)
+    bf_solution = brute_force_knapsack(weights, values, W)
+    println(bf_solution)
+
+    greedy_solution = greedy_knapsack(weights, values, W)
+    println(greedy_solution)
+
+    dp_solution = dynamic_programming_knapsack(weights, values, W)
+    println(dp_solution)
+
+    bf_score = sum(bf_solution .* values)
+    greedy_score = sum(greedy_solution .* values)
+    dp_score = sum(dp_solution .* values)
+    println("BF score vs Greedy score vs DP score: ", bf_score, " vs ", greedy_score, " vs ", dp_score)
 
 end
 
