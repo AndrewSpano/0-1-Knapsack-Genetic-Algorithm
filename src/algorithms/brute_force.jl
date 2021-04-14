@@ -1,4 +1,6 @@
-function brute_force_knapsack(weights, values, knapsack_capacity)
+function brute_force_knapsack(weights::Array, values::Array, knapsack_capacity::Int64)
+	#= finds am optimal solution to the 0-1 knapsack problem defined by the
+		above parameters, using brute force =#
 
 	num_items = size(weights, 1)
 	best_config = 0
@@ -19,4 +21,14 @@ function brute_force_knapsack(weights, values, knapsack_capacity)
 	end
 
 	return BitArray(digits(best_config, base = 2, pad = num_items))
+end
+
+
+function run_bf(weights::Array, values::Array, knapsack_capacity::Int64)
+    #= used to run the brute force algorithm =#
+    exe_time = @timed begin
+        best_config = brute_force_knapsack(weights, values, knapsack_capacity)
+    end
+    
+    return best_config, exe_time.time
 end
