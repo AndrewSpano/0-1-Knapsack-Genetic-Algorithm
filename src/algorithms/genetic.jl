@@ -1,6 +1,8 @@
 # using Pkg
 # Pkg.add("StatsBase")
 
+include("../utils/plot_results.jl")
+
 import Random
 import StatsBase
 
@@ -82,6 +84,18 @@ function genetic_knapsack(weights::Array{Int64, 1}, values::Array{Int64, 1}, kna
     
     - `verbose::Bool = false`:
         If specified, then information about every generation gets printed in the console.
+    
+    - `plot_best_fitness_per_generation::Bool = false`:
+        If specified, then a plot with the best fitness of every generation will be created.
+    
+    - `optimal_fitness::Float64 = 0.0`:
+        The optimal score (fitness) found from Dynamic Programming.
+
+    - `greedy_fitness::Float64 = 0.0`:
+        The score (fitness) found from the greedy algorithm.
+
+    - `plot_filepath::String = ../plots/plot.png`:
+        The relative/absolute path to save the plot fitness vs generations.
     """
 
     # get a dictionary from the keyword arguments
@@ -95,10 +109,15 @@ function genetic_knapsack(weights::Array{Int64, 1}, values::Array{Int64, 1}, kna
     num_mutations = get(kwargs_dict, :num_mutations, 1)
     mutation_prob = get(kwargs_dict, :mutation_prob, 0.5)
     verbose = get(kwargs_dict, :verbose, false)
+    _plot_fpg = get(kwargs_dict, :plot_best_fitness_per_generation, false)
+    optimal_fitness = get(kwargs_dict, :optimal_fitness, 0.0)
+    greedy_fitness = get(kwargs_dict, :greedy_fitness, 0.0)
+    plot_filepath = get(kwargs_dict, :plot_filepath, "../plots/plot.png")
 
     # create a population of genomes
     n_items = size(weights, 1)
     population = [random_genome(n_items, init_zeros) for _ = 1 : population_size]
+    fpg = []
 
     # keep track of the best genome
     best_config = falses(n_items)
@@ -116,6 +135,7 @@ function genetic_knapsack(weights::Array{Int64, 1}, values::Array{Int64, 1}, kna
 
         population = getindex.(population_fitnesses, 1)
         fitnesses = getindex.(population_fitnesses, 2)
+        push!(fpg, fitnesses[1])
 
         # check for early stopping, but make sure at least 1 legit solution has been found
         if 1e-8 < fitnesses[1] <= best_score + threshold
@@ -149,6 +169,11 @@ function genetic_knapsack(weights::Array{Int64, 1}, values::Array{Int64, 1}, kna
             println("Completed generation ", generation)
         end
         population = new_population
+    end
+
+    # plot the generatiovs vs fitness graph if specified
+    if _plot_fpg
+        plot_fpg(fpg, optimal_fitness, greedy_fitness, plot_filepath)
     end
 
     return best_config
