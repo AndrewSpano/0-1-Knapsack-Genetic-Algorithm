@@ -5,18 +5,19 @@ include("../algorithms/genetic.jl")
 include("plot_results.jl")
 
 
-function bf_experiment(benchmark_W::Int64, min_items::Int64, max_items::Int64, log_results::Bool = false, plot_results::Bool = true)
+function bf_experiment(benchmark_W::UInt32, min_items::Int64, max_items::Int64, log_results::Bool = false, plot_results::Bool = true)
+    """ Performs an experiment for the brute force algorithm, just to show it's slowness. """
 
     runtimes = []
 
     for n_items = min_items : max_items
 
-        knapsack_capacity = benchmark_W * n_items
+        knapsack_capacity = UInt32(benchmark_W * n_items)
         max_weight = benchmark_W * n_items / 2
         max_value = benchmark_W
 
-        weights = rand(1:max_weight, n_items)
-        values = rand(1:max_value, n_items)
+        weights = Array{UInt32}(rand(1:max_weight, n_items))
+        values = Array{UInt32}(rand(1:max_value, n_items))
         best_config, exe_time = run_bf(weights, values, knapsack_capacity)
 
         if log_results
@@ -44,7 +45,8 @@ function solution_accuracy(targets, outputs)
 end
 
 
-function greedy_dp_genetic_experiment(benchmark_W::Int64, min_items::Int64, max_items::Int64, iter_per_n::Int64, log_results::Bool = false, plot_results::Bool = true)
+function greedy_dp_genetic_experiment(benchmark_W::UInt32, min_items::Int64, max_items::Int64, iter_per_n::Int64, log_results::Bool = false, plot_results::Bool = true)
+    """ Performs an experiment for the Genetic Algorithm. It compares it's results and runtime with DP and greedy """
 
     # metrics to be returned
     greedy_average_runtimes = []
@@ -59,8 +61,8 @@ function greedy_dp_genetic_experiment(benchmark_W::Int64, min_items::Int64, max_
     for n_items = min_items : max_items
 
         # define the values of the experiment
-        knapsack_capacity = benchmark_W * n_items
-        max_weight = Int64(benchmark_W * n_items / 2)
+        knapsack_capacity = UInt32(benchmark_W * n_items)
+        max_weight = UInt32(benchmark_W * n_items / 2)
         max_value = benchmark_W
 
         # initialize sums
@@ -76,8 +78,8 @@ function greedy_dp_genetic_experiment(benchmark_W::Int64, min_items::Int64, max_
         for _ = 1 : iter_per_n
 
             # compute random weights and values
-            weights = rand(1:max_weight, n_items)
-            values = rand(1:max_value, n_items)
+            weights = Array{UInt32}(rand(1:max_weight, n_items))
+            values = Array{UInt32}(rand(1:max_value, n_items))
 
             # run the algorithms
             greedy_config, greedy_runtime = run_greedy(weights, values, knapsack_capacity)
@@ -140,16 +142,17 @@ end
 
 
 
-function genetic_score_comparison(benchmark_W::Int64, n_items::Int64, population_size::Int64, plot_filepath::String)
+function genetic_score_comparison(benchmark_W::UInt32, n_items::Int64, population_size::Int64, plot_filepath::String)
+    """ Performs an experiment for the Genetic Algorithm in order to find good hyperparameters """
 
     # define the values of the experiment
-    knapsack_capacity = benchmark_W * n_items
-    max_weight = Int64(benchmark_W * n_items * 2)
+    knapsack_capacity = UInt32(benchmark_W * n_items)
+    max_weight = UInt32(benchmark_W * n_items * 2)
     max_value = benchmark_W
 
     # compute random weights and values
-    weights = rand(1:max_weight, n_items)
-    values = rand(1:max_value, n_items)
+    weights = Array{UInt32}(rand(1:max_weight, n_items))
+    values = Array{UInt32}(rand(1:max_value, n_items))
 
     # run the algorithms
     greedy_config = greedy_knapsack(weights, values, knapsack_capacity)
@@ -160,5 +163,4 @@ function genetic_score_comparison(benchmark_W::Int64, n_items::Int64, population
     genetic_knapsack(weights, values, knapsack_capacity, population_size = population_size, init_zeros = true, max_generations = 1000,
                      patience = 25, plot_best_fitness_per_generation = true, optimal_fitness = dp_score, greedy_fitness = greedy_score,
                      plot_filepath = plot_filepath)
-
 end

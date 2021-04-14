@@ -1,6 +1,3 @@
-# using Pkg
-# Pkg.add("StatsBase")
-
 include("../utils/plot_results.jl")
 
 import Random
@@ -8,6 +5,7 @@ import StatsBase
 
 
 function random_genome(dim::Int64, init_zeros::Bool)
+    """ produces a new genome by initializing it's values and returning it """
     if init_zeros
         return falses(dim)
     else
@@ -16,7 +14,8 @@ function random_genome(dim::Int64, init_zeros::Bool)
 end
 
 
-function fitness(genome::BitArray, weights::Array, values::Array, knapsack_capacity::Int64)
+function fitness(genome::BitArray{1}, weights::Array{UInt32, 1}, values::Array{UInt32, 1}, knapsack_capacity::UInt32)
+    """ computes the fitness (score) of a given genome """
     total_weight = sum(genome .* weights)
     if total_weight > knapsack_capacity
         return 1e-8
@@ -25,40 +24,43 @@ function fitness(genome::BitArray, weights::Array, values::Array, knapsack_capac
 end
 
 
-function random_pair(population::Array, fitnesses::Array)
+function random_pair(population::Array{BitArray{1}, 1}, fitnesses::Array{Float64, 1})
+    """ pick 2 genomes out of a population, using their fitnesses as weights """
     return StatsBase.sample(population, StatsBase.Weights(fitnesses), 2, replace = false)
 end
 
 
-function random_crossover(genome_a::BitArray, genome_b::BitArray, num_items::Int64)
-    crossover_bit = rand(0:num_items)
+function random_crossover(genome_a::BitArray{1}, genome_b::BitArray{1}, n_items::Int64)
+    """ crossover two genomes at a random points """
+    crossover_bit = rand(0:n_items)
     new_genome_a = vcat(genome_a[1 : crossover_bit], genome_b[crossover_bit + 1 : end])
     new_genome_b = vcat(genome_b[1 : crossover_bit], genome_a[crossover_bit + 1 : end])
     return new_genome_a, new_genome_b
 end
 
 
-function random_mutation(genome::BitArray, num_items::Int64, num_mutations::Int64, mutation_probability::Float64)
+function random_mutation(genome::BitArray{1}, n_items::Int64, num_mutations::Int64, mutation_probability::Float64)
+    """ mutate `num_mutations` bits of a given genome, with probability  `mutation_probability` """
     for _ = 1 : num_mutations
         if rand() < mutation_probability
-            random_bit = rand(1:num_items)
+            random_bit = rand(1:n_items)
             genome[random_bit] = 1 - genome[random_bit]
         end
     end
 end
 
 
-function genetic_knapsack(weights::Array{Int64, 1}, values::Array{Int64, 1}, knapsack_capacity::Int64; kwargs...)
+function genetic_knapsack(weights::Array{UInt32, 1}, values::Array{UInt32, 1}, knapsack_capacity::UInt32; kwargs...)
     """
     # Arguments
 
-    - `weights::Array{Int64, 1}`:
+    - `weights::Array{UInt32, 1}`:
         An array containing the "weight" of each item.
 
-    - `values::Array{Int64, 1}`:
+    - `values::Array{UInt32, 1}`:
         An array containing the "value" of each item.
     
-    - `knapsack_capacity::Int64`:
+    - `knapsack_capacity::UInt32`:
         The maximum sum of weights of selected items, that is, the capacity of the knapsack.
 
     - `population_size::Int64` = 100:
@@ -96,6 +98,9 @@ function genetic_knapsack(weights::Array{Int64, 1}, values::Array{Int64, 1}, kna
 
     - `plot_filepath::String = ../plots/plot.png`:
         The relative/absolute path to save the plot fitness vs generations.
+
+    Computes a solution for the 0-1 Knapsack problem using a Genetic Algorithm which performs steps of:
+        Elitism (survival of the fittest), random selection and crossover, random mutation.
     """
 
     # get a dictionary from the keyword arguments
@@ -152,7 +157,7 @@ function genetic_knapsack(weights::Array{Int64, 1}, values::Array{Int64, 1}, kna
             break
         end
 
-        # start creating the new population of the next generation
+        # Elitism
         new_population = population[1:2]
 
         for _ = 1 : population_size / 2 - 1
@@ -180,7 +185,8 @@ function genetic_knapsack(weights::Array{Int64, 1}, values::Array{Int64, 1}, kna
 end
 
 
-function run_genetic(weights::Array, values::Array, knapsack_capacity::Int64)
+function run_genetic(weights::Array{UInt32, 1}, values::Array{UInt32, 1}, knapsack_capacity::UInt32)
+	""" runs the above function, while also returning the execution time """
     exe_time = @timed begin
         best_config = genetic_knapsack(weights, values, knapsack_capacity, population_size = 1000, max_generations = 100, init_zeros = true)
     end

@@ -1,18 +1,5 @@
-# using Pkg
-# Pkg.add("Plots")
-
 import Plots
 
-
-function plot_fpg(best_fitness_per_generation::Array{Any, 1}, optimal_fitness::Int64, greedy_fitness::Int64, plot_filepath::String)
-    optimal_value = ones(size(best_fitness_per_generation, 1)) * optimal_fitness
-    greedy_value = ones(size(best_fitness_per_generation, 1)) * greedy_fitness
-    p = Plots.plot(best_fitness_per_generation, title = "Fitness of best Genome per Generation", label = "Genetic",
-                   lw = 2, ylims = (0, (11/10) * optimal_fitness), xlabel = "generations", ylabel = "fitness", legend = :right)
-    Plots.plot!(p, optimal_value, label = "DP", lw = 2)
-    Plots.plot!(p, greedy_value, label = "Greedy", lw = 2)
-    Plots.savefig(plot_filepath)
-end
 
 function plot_bf(runtimes::Array{Any, 1})
     Plots.plot(runtimes, title = "Brute-Force 0-1 Knapsack Runtime", label = "Brute Force",
@@ -47,4 +34,15 @@ function plot_dp_vs_genetic(gr_ar::Array{Any, 1}, gr_a_sa::Array{Any, 1}, gr_a_s
     Plots.plot!(p, gr_a_sola, label = "Greedy", lw = 2)
     Plots.plot!(p, genetic_a_sola, label = "Genetic", lw = 2)
     Plots.savefig("../plots/greedy_dp_genetic_knapsack_solution_accuracy.png")
+end
+
+
+function plot_fpg(best_fitness_per_generation::Array{Any, 1}, optimal_fitness::UInt64, greedy_fitness::UInt64, plot_filepath::String)
+    optimal_value = ones(size(best_fitness_per_generation, 1)) * optimal_fitness
+    greedy_value = ones(size(best_fitness_per_generation, 1)) * greedy_fitness
+    p = Plots.plot(best_fitness_per_generation, title = "Fitness of best Genome per Generation", label = "Genetic",
+                   lw = 2, ylims = (0, (11/10) * optimal_fitness), xlabel = "generations", ylabel = "fitness", legend = :right)
+    Plots.plot!(p, optimal_value, label = "DP", lw = 2)
+    Plots.plot!(p, greedy_value, label = "Greedy", lw = 2)
+    Plots.savefig(plot_filepath)
 end
