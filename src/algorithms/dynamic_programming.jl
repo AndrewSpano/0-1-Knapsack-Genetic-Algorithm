@@ -44,7 +44,7 @@ end
 
 
 function run_dp(weights::Array{UInt32, 1}, values::Array{UInt32, 1}, knapsack_capacity::UInt32)
-	""" runs the above function, while also returning the execution time """
+    """ runs the above function, while also returning the execution time """
     exe_time = @timed begin
         best_config = dynamic_programming_knapsack(weights, values, knapsack_capacity)
     end

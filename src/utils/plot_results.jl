@@ -41,7 +41,8 @@ function plot_fpg(best_fitness_per_generation::Array{Any, 1}, optimal_fitness::U
     optimal_value = ones(size(best_fitness_per_generation, 1)) * optimal_fitness
     greedy_value = ones(size(best_fitness_per_generation, 1)) * greedy_fitness
     p = Plots.plot(best_fitness_per_generation, title = "Fitness of best Genome per Generation", label = "Genetic",
-                   lw = 2, ylims = (0, (11/10) * optimal_fitness), xlabel = "generations", ylabel = "fitness", legend = :right)
+                   size = (750, floor(750 / 1.618)), lw = 2, ylims = (0, (11/10) * optimal_fitness),
+                   xlabel = "generations", ylabel = "fitness", legend = :right)
     Plots.plot!(p, optimal_value, label = "DP", lw = 2)
     Plots.plot!(p, greedy_value, label = "Greedy", lw = 2)
     Plots.savefig(plot_filepath)

@@ -78,6 +78,9 @@ function genetic_knapsack(weights::Array{UInt32, 1}, values::Array{UInt32, 1}, k
     - `patience::Int64` = 5:
         Number of generations to wait for improvement.
 
+    - `elitism_amount::Int64` = 2:
+        Number of best genomes that get transmitted in the next generation, without changing.
+
     - `num_mutations::Int64` = 1:
         Number of mutations to perform during the mutation procedure.
 
@@ -111,6 +114,7 @@ function genetic_knapsack(weights::Array{UInt32, 1}, values::Array{UInt32, 1}, k
     max_generations = get(kwargs_dict, :max_generations, 100)
     threshold = get(kwargs_dict, :threshold, 0)
     patience = get(kwargs_dict, :patience, 5)
+    elitism_amount = get(kwargs_dict, :elitism_amount, 2)
     num_mutations = get(kwargs_dict, :num_mutations, 1)
     mutation_prob = get(kwargs_dict, :mutation_prob, 0.5)
     verbose = get(kwargs_dict, :verbose, false)
@@ -157,10 +161,12 @@ function genetic_knapsack(weights::Array{UInt32, 1}, values::Array{UInt32, 1}, k
             break
         end
 
-        # Elitism
-        new_population = population[1:2]
+        # elitism
+        new_population = population[1:elitism_amount]
 
-        for _ = 1 : population_size / 2 - 1
+        # repopulate
+        iterations = floor((population_size - elitism_amount) / 2)
+        for _ = 1 : iterations
 
             genome_a, genome_b = random_pair(population, fitnesses)
             child_a, child_b = random_crossover(genome_a, genome_b, n_items)
@@ -186,7 +192,7 @@ end
 
 
 function run_genetic(weights::Array{UInt32, 1}, values::Array{UInt32, 1}, knapsack_capacity::UInt32)
-	""" runs the above function, while also returning the execution time """
+    """ runs the above function, while also returning the execution time """
     exe_time = @timed begin
         best_config = genetic_knapsack(weights, values, knapsack_capacity, population_size = 1000, max_generations = 100, init_zeros = true)
     end

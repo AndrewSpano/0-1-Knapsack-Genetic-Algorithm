@@ -27,9 +27,9 @@ end
 
 function run_bf(weights::Array{UInt32, 1}, values::Array{UInt32, 1}, knapsack_capacity::UInt32)
 	""" runs the above function, while also returning the execution time """
-    exe_time = @timed begin
-        best_config = brute_force_knapsack(weights, values, knapsack_capacity)
-    end
-    
-    return best_config, exe_time.time
+	exe_time = @timed begin
+		best_config = brute_force_knapsack(weights, values, knapsack_capacity)
+	end
+
+	return best_config, exe_time.time
 end

@@ -147,11 +147,12 @@ function genetic_score_comparison(benchmark_W::UInt32, n_items::Int64, populatio
 
     # define the values of the experiment
     knapsack_capacity = UInt32(benchmark_W * n_items)
-    max_weight = UInt32(benchmark_W * n_items * 2)
+    min_weight = UInt32(benchmark_W * n_items / 10)
+    max_weight = UInt32(benchmark_W * n_items)
     max_value = benchmark_W
 
     # compute random weights and values
-    weights = Array{UInt32}(rand(1:max_weight, n_items))
+    weights = Array{UInt32}(rand(min_weight:max_weight, n_items))
     values = Array{UInt32}(rand(1:max_value, n_items))
 
     # run the algorithms
